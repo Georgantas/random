@@ -7,7 +7,7 @@ template <long N, int BLOCK_SIZE>
 class BlockMatrixMultipler : public IMatrixMultiplier<N>
 {
 public:
-    virtual void multiply(float (&A)[N][N], float (&B)[N][N], float (&C)[N][N])
+    virtual void multiply(float (&A)[N][N], float (&B)[N][N], float (&C)[N][N]) override
     {
         // https://csapp.cs.cmu.edu/public/waside/waside-blocking.pdf
 

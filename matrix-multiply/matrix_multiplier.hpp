@@ -4,6 +4,6 @@
 template<long N>
 class IMatrixMultiplier { 
     public:
-        virtual void multiply(float (&)[N][N], float (&)[N][N], float (&)[N][N]);
+        virtual void multiply(float (&)[N][N], float (&)[N][N], float (&)[N][N]) = 0;
 };
 

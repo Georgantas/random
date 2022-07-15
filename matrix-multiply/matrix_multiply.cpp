@@ -45,6 +45,8 @@ void benchmark_matrix_multiply(IMatrixMultiplier<N> &matrix_multiplier,
 {
     constexpr long FLOPs = 2 * N * N * N;
 
+    clear_matrix(C);
+
     auto t1 = std::chrono::high_resolution_clock::now();
 
     matrix_multiplier.multiply(A, B, C);
@@ -87,14 +89,14 @@ int main()
     benchmark_matrix_multiply<N>(standard_matrix_multiplier, A, B, C, expected);
 
     // FLOPs: 2147483648
-    // Execution time: 3.87 seconds
-    // GFLOPS: 0.5551
+    // Execution time: 3.35 seconds
+    // GFLOPS: 0.6402
     BlockMatrixMultipler<N, 16> block_matrix_multiplier;
     benchmark_matrix_multiply<N>(block_matrix_multiplier, A, B, C, expected);
 
     // FLOPs: 2147483648
-    // Execution time: 0.33 seconds
-    // GFLOPS: 6.4878
+    // Execution time: 0.10 seconds
+    // GFLOPS: 20.7495
     OpenCLMatrixMultiplier<N> opencl_matrix_multiplier;
     benchmark_matrix_multiply<N>(opencl_matrix_multiplier, A, B, C, expected);
 }
