@@ -1,114 +1,109 @@
 
+// Taken from: https://ulhpc-tutorials.readthedocs.io/en/latest/gpu/opencl/
 
-// Code taken from: https://www.eriksmistad.no/getting-started-with-opencl-and-gpu-computing/
+// Original tutorial: "Tutorial: Simple start with OpenCL and C++",
+// https://programmerclick.com/article/47811146604/
 
-#include <stdio.h>
-#include <stdlib.h>
- 
-#ifdef __APPLE__
-#include <OpenCL/opencl.h>
-#else
-#include <CL/cl.h>
-#endif
- 
-#define MAX_SOURCE_SIZE (0x100000)
- 
-int main(void) {
-    // Create the two input vectors
-    int i;
-    const int LIST_SIZE = 1024;
-    int *A = (int*)malloc(sizeof(int)*LIST_SIZE);
-    int *B = (int*)malloc(sizeof(int)*LIST_SIZE);
-    for(i = 0; i < LIST_SIZE; i++) {
-        A[i] = i;
-        B[i] = LIST_SIZE - i;
-    }
- 
-    // Load the kernel source code into the array source_str
-    FILE *fp;
-    char *source_str;
-    size_t source_size;
- 
-    fp = fopen("vector_add_kernel.cl", "r");
-    if (!fp) {
-        fprintf(stderr, "Failed to load kernel.\n");
+#define SIZE 10
+#define CL_USE_DEPRECATED_OPENCL_2_0_APIS
+#include <CL/cl.hpp>
+#include <iostream>
+
+using namespace std;
+
+// kernel calculates for each element C=A+B
+std::string kernel_code =
+    "   void kernel simple_add(global const int* A, global const int* B, global int* C){ "
+    "       C[get_global_id(0)]=A[get_global_id(0)]+B[get_global_id(0)];                 "
+    "   }                                                                               ";
+
+int main()
+{
+
+    // If there are no opencl platforms -  all_platforms == 0 and the program exits.
+
+    // One of the key features of OpenCL is its portability. So, for instance, there might be situations
+    //  in which both the CPU and the GPU can run OpenCL code. Thus,
+    //  a good practice is to verify the OpenCL platforms to choose on which the compiled code run.
+
+    std::vector<cl::Platform> all_platforms;
+    cl::Platform::get(&all_platforms);
+    if (all_platforms.size() == 0)
+    {
+        std::cout << " No OpenCL platforms found.\n";
         exit(1);
     }
-    source_str = (char*)malloc(MAX_SOURCE_SIZE);
-    source_size = fread( source_str, 1, MAX_SOURCE_SIZE, fp);
-    fclose( fp );
- 
-    // Get platform and device information
-    cl_platform_id platform_id = NULL;
-    cl_device_id device_id = NULL;   
-    cl_uint ret_num_devices;
-    cl_uint ret_num_platforms;
-    cl_int ret = clGetPlatformIDs(1, &platform_id, &ret_num_platforms);
-    ret = clGetDeviceIDs( platform_id, CL_DEVICE_TYPE_DEFAULT, 1, 
-            &device_id, &ret_num_devices);
- 
-    // Create an OpenCL context
-    cl_context context = clCreateContext( NULL, 1, &device_id, NULL, NULL, &ret);
- 
-    // Create a command queue
-    cl_command_queue command_queue = clCreateCommandQueue(context, device_id, 0, &ret);
- 
-    // Create memory buffers on the device for each vector 
-    cl_mem a_mem_obj = clCreateBuffer(context, CL_MEM_READ_ONLY, 
-            LIST_SIZE * sizeof(int), NULL, &ret);
-    cl_mem b_mem_obj = clCreateBuffer(context, CL_MEM_READ_ONLY,
-            LIST_SIZE * sizeof(int), NULL, &ret);
-    cl_mem c_mem_obj = clCreateBuffer(context, CL_MEM_WRITE_ONLY, 
-            LIST_SIZE * sizeof(int), NULL, &ret);
- 
-    // Copy the lists A and B to their respective memory buffers
-    ret = clEnqueueWriteBuffer(command_queue, a_mem_obj, CL_TRUE, 0,
-            LIST_SIZE * sizeof(int), A, 0, NULL, NULL);
-    ret = clEnqueueWriteBuffer(command_queue, b_mem_obj, CL_TRUE, 0, 
-            LIST_SIZE * sizeof(int), B, 0, NULL, NULL);
- 
-    // Create a program from the kernel source
-    cl_program program = clCreateProgramWithSource(context, 1, 
-            (const char **)&source_str, (const size_t *)&source_size, &ret);
- 
-    // Build the program
-    ret = clBuildProgram(program, 1, &device_id, NULL, NULL, NULL);
- 
-    // Create the OpenCL kernel
-    cl_kernel kernel = clCreateKernel(program, "vector_add", &ret);
- 
-    // Set the arguments of the kernel
-    ret = clSetKernelArg(kernel, 0, sizeof(cl_mem), (void *)&a_mem_obj);
-    ret = clSetKernelArg(kernel, 1, sizeof(cl_mem), (void *)&b_mem_obj);
-    ret = clSetKernelArg(kernel, 2, sizeof(cl_mem), (void *)&c_mem_obj);
- 
-    // Execute the OpenCL kernel on the list
-    size_t global_item_size = LIST_SIZE; // Process the entire lists
-    size_t local_item_size = 64; // Divide work items into groups of 64
-    ret = clEnqueueNDRangeKernel(command_queue, kernel, 1, NULL, 
-            &global_item_size, &local_item_size, 0, NULL, NULL);
- 
-    // Read the memory buffer C on the device to the local variable C
-    int *C = (int*)malloc(sizeof(int)*LIST_SIZE);
-    ret = clEnqueueReadBuffer(command_queue, c_mem_obj, CL_TRUE, 0, 
-            LIST_SIZE * sizeof(int), C, 0, NULL, NULL);
- 
-    // Display the result to the screen
-    for(i = 0; i < LIST_SIZE; i++)
-        printf("%d + %d = %d\n", A[i], B[i], C[i]);
- 
-    // Clean up
-    ret = clFlush(command_queue);
-    ret = clFinish(command_queue);
-    ret = clReleaseKernel(kernel);
-    ret = clReleaseProgram(program);
-    ret = clReleaseMemObject(a_mem_obj);
-    ret = clReleaseMemObject(b_mem_obj);
-    ret = clReleaseMemObject(c_mem_obj);
-    ret = clReleaseCommandQueue(command_queue);
-    ret = clReleaseContext(context);
-    free(A);
-    free(B);
-    free(C);
+
+    // We are going to use the platform of id == 0
+    cl::Platform default_platform = all_platforms[0];
+    std::cout << "Using platform: " << default_platform.getInfo<CL_PLATFORM_NAME>() << "\n";
+
+    // An OpenCL platform might have several devices.
+    // The next step is to ensure that the code will run on the first device of the platform,
+    // if found.
+
+    std::vector<cl::Device> all_devices;
+    default_platform.getDevices(CL_DEVICE_TYPE_ALL, &all_devices);
+    if (all_devices.size() == 0)
+    {
+        std::cout << " No devices found.\n";
+        exit(1);
+    }
+
+    cl::Device default_device = all_devices[0];
+    std::cout << "Using device: " << default_device.getInfo<CL_DEVICE_NAME>() << "\n";
+
+    cl::Context context({default_device});
+
+    // create buffers on the device
+    cl::Buffer A_d(context, CL_MEM_READ_ONLY, sizeof(int) * SIZE);
+    cl::Buffer B_d(context, CL_MEM_READ_ONLY, sizeof(int) * SIZE);
+    cl::Buffer C_d(context, CL_MEM_WRITE_ONLY, sizeof(int) * SIZE);
+
+    int A_h[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+    int B_h[] = {10, 9, 8, 7, 6, 5, 4, 3, 2, 1};
+
+    // create queue to push commands to the device.
+    cl::CommandQueue queue(context, default_device);
+
+    // write arrays A and B to the device
+    queue.enqueueWriteBuffer(A_d, CL_TRUE, 0, sizeof(int) * SIZE, A_h);
+    queue.enqueueWriteBuffer(B_d, CL_TRUE, 0, sizeof(int) * SIZE, B_h);
+
+    cl::Program::Sources sources;
+
+    // Appending the kernel, which is presented here as a string.
+    sources.push_back({kernel_code.c_str(), kernel_code.length()});
+
+    // OpenCL compiles the kernel in runtime, that's the reason it is expressed as a string.
+    // There are also ways to compile the device-side code offline.
+    cl::Program program(context, sources);
+
+    if (program.build({default_device}) != CL_SUCCESS)
+    {
+        std::cout << " Error building: " << program.getBuildInfo<CL_PROGRAM_BUILD_LOG>(default_device) << "\n";
+        exit(1);
+    }
+    // If runtime compilation are found they are presented in this point of the program.
+
+    // From the program, which contains the "simple_add" kernel, create a kernel for execution
+    // with three cl:buffers as parameters.
+    // The types must match the arguments of the kernel function.
+    cl::make_kernel<cl::Buffer, cl::Buffer, cl::Buffer> simple_add(cl::Kernel(program, "simple_add"));
+
+    // Details to enqueue the kernel for execution.
+    cl::NDRange global(SIZE);
+    simple_add(cl::EnqueueArgs(queue, global), A_d, B_d, C_d).wait();
+
+    int C_h[SIZE];
+    // read result C_d from the device to array C_h
+    queue.enqueueReadBuffer(C_d, CL_TRUE, 0, sizeof(int) * SIZE, C_h);
+
+    std::cout << " result: \n";
+    for (int i = 0; i < 10; i++)
+    {
+        std::cout << C_h[i] << " ";
+    }
+
     return 0;
 }
