@@ -82,31 +82,12 @@ int main()
 
     fclose(file);
 
-    // FLOPs: 2147483648
-    // Execution time: 5.25 seconds
-    // GFLOPS: 0.4090
     StandardMatrixMultipler<N> standard_matrix_multiplier;
     benchmark_matrix_multiply<N>(standard_matrix_multiplier, A, B, C, expected);
 
-    // FLOPs: 2147483648
-    // Execution time: 3.35 seconds
-    // GFLOPS: 0.6402
     BlockMatrixMultipler<N, 16> block_matrix_multiplier;
     benchmark_matrix_multiply<N>(block_matrix_multiplier, A, B, C, expected);
 
-    // Platform: NVIDIA TITAN Xp
-    // Device: NVIDIA CUDA
-    // ---
-    // FLOPs: 2147483648
-    // Execution time: 0.04 seconds
-    // GFLOPS: 51.8588
-
-    // Platform: Intel(R) Core(TM) i7-10710U CPU @ 1.10GHz
-    // Device: Intel(R) OpenCL
-    // ---
-    // FLOPs: 2147483648
-    // Execution time: 0.10 seconds
-    // GFLOPS: 20.7495
     OpenCLMatrixMultiplier<N> opencl_matrix_multiplier;
     benchmark_matrix_multiply<N>(opencl_matrix_multiplier, A, B, C, expected);
 }
