@@ -1,0 +1,3 @@
+*.o
+.vscode/
+matrix_multiply
