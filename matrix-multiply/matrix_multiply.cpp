@@ -94,6 +94,16 @@ int main()
     BlockMatrixMultipler<N, 16> block_matrix_multiplier;
     benchmark_matrix_multiply<N>(block_matrix_multiplier, A, B, C, expected);
 
+    // Platform: NVIDIA TITAN Xp
+    // Device: NVIDIA CUDA
+    // ---
+    // FLOPs: 2147483648
+    // Execution time: 0.04 seconds
+    // GFLOPS: 51.8588
+
+    // Platform: Intel(R) Core(TM) i7-10710U CPU @ 1.10GHz
+    // Device: Intel(R) OpenCL
+    // ---
     // FLOPs: 2147483648
     // Execution time: 0.10 seconds
     // GFLOPS: 20.7495
