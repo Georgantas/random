@@ -7,3 +7,4 @@
 | TransposedBlockMatrixMultiplier (todo) | Similar to BlockMatrixMultiplier, but load the matrix "B" to memory transposed and use SIMD instructions to perform the block dot products. |  |
 | NumpyMatrixMultiplier (todo) | Multiply with a matrix in python using numpy for comparison. | |
 | CublasMatrixMultiplier (todo) | Use cuBLAS. | |
+| GPGPUMatrixMultiplier (todo) | Multiply with a GPU Shader. | |
