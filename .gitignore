@@ -1,3 +1,4 @@
 *.o
 .vscode/
 matrix_multiply
+build/
