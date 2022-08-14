@@ -6,10 +6,11 @@
 #include <cstdlib>
 #include <fstream>
 #include <streambuf>
-#include "matrix_multiplier.hpp"
-#include "standard_matrix_multiplier.hpp"
-#include "block_matrix_multipler.hpp"
-#include "opencl_matrix_multiplier.hpp"
+#include <matrix_multiplier.hpp>
+#include <standard_matrix_multiplier.hpp>
+#include <block_matrix_multipler.hpp>
+#include <opencl_matrix_multiplier.hpp>
+#include <cublas_matrix_multiplier.hpp>
 
 template <long N>
 void assert_arrays_equal(float (&actual)[N][N], float (&expected)[N][N])
@@ -90,4 +91,7 @@ int main()
 
     OpenCLMatrixMultiplier<N> opencl_matrix_multiplier;
     benchmark_matrix_multiply<N>(opencl_matrix_multiplier, A, B, C, expected);
+
+    CublasMatrixMultiplier<N> cublas_matrix_multiplier;
+    benchmark_matrix_multiply<N>(cublas_matrix_multiplier, A, B, C, expected);
 }

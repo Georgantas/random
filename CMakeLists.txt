@@ -4,14 +4,14 @@ cmake_minimum_required(VERSION 3.10.0)
 project(benchmark_matrix_multiply LANGUAGES CXX CUDA)
 
 find_library(CUDART_LIBRARY cudart ${CMAKE_CUDA_IMPLICIT_LINK_DIRECTORIES})
+find_library(CUBLAS_LIBRARY cublas ${CMAKE_CUDA_IMPLICIT_LINK_DIRECTORIES})
 
 find_package(OpenCL REQUIRED)
 
 add_executable(
     ${PROJECT_NAME}
-    matrix_multiply.cpp
-    # matrix_multiply_kernel.cl
-    # 1024_matrix_data
+    src/matrix_multiply.cpp
+    src/cublas_matrix_multiplier.cu
 )
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
@@ -27,8 +27,9 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 target_link_libraries(
     ${PROJECT_NAME}
     ${CUDART_LIBRARY}
+    ${CUBLAS_LIBRARY}
     OpenCL::OpenCL
 )
 
-configure_file(matrix_multiply_kernel.cl matrix_multiply_kernel.cl COPYONLY)
-configure_file(1024_matrix_data 1024_matrix_data COPYONLY)
+configure_file(resources/matrix_multiply_kernel.cl matrix_multiply_kernel.cl COPYONLY)
+configure_file(resources/1024_matrix_data 1024_matrix_data COPYONLY)
