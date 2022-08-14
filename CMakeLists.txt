@@ -14,6 +14,7 @@ add_executable(
     src/cublas_matrix_multiplier.cu
     src/standard_matrix_multiplier.cpp
     src/opencl_matrix_multiplier.cpp
+    src/cuda_block_matrix_multiplier.cu
 )
 
 set_target_properties(${PROJECT_NAME} PROPERTIES

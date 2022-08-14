@@ -11,6 +11,7 @@
 #include <block_matrix_multiplier.hpp>
 #include <opencl_matrix_multiplier.hpp>
 #include <cublas_matrix_multiplier.hpp>
+#include <cuda_block_matrix_multiplier.hpp>
 
 template <long N>
 void assert_arrays_equal(float (&actual)[N][N], float (&expected)[N][N])
@@ -94,4 +95,7 @@ int main()
 
     CublasMatrixMultiplier<N> cublas_matrix_multiplier;
     benchmark_matrix_multiply<N>(cublas_matrix_multiplier, A, B, C, expected);
+
+    CudaBlockMatrixMultipler<N> cuda_block_matrix_multiplier;
+    benchmark_matrix_multiply<N>(cuda_block_matrix_multiplier, A, B, C, expected);
 }
