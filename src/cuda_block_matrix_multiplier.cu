@@ -52,7 +52,8 @@ __global__ void MatMulKernel(Matrix A, Matrix B, Matrix C)
     // required to compute Csub
     // Multiply each pair of sub-matrices together
     // and accumulate the results
-    for (int m = 0; m < (A.width / BLOCK_SIZE); ++m) {
+    for (int m = 0; m < (A.width / BLOCK_SIZE); ++m)
+    {
 
         // Get sub-matrix Asub of A
         Matrix Asub = GetSubMatrix(A, blockRow, m);
@@ -126,3 +127,5 @@ void CudaBlockMatrixMultipler<N>::multiply(float (&A)[N][N], float (&B)[N][N], f
     // Read C from device memory
     cudaMemcpy(C, d_C.elements, size, cudaMemcpyDeviceToHost);
 }
+
+template class CudaBlockMatrixMultipler<1024>;
