@@ -3,8 +3,8 @@
 
 #pragma once
 
-template <long N>
-class StandardMatrixMultipler : public IMatrixMultiplier<N>
+template <long N, int BLOCK_SIZE>
+class BlockMatrixMultiplier : public IMatrixMultiplier<N>
 {
 public:
     virtual void multiply(float (&A)[N][N], float (&B)[N][N], float (&C)[N][N]) override;

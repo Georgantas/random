@@ -11,7 +11,10 @@ find_package(OpenCL REQUIRED)
 add_executable(
     ${PROJECT_NAME}
     src/matrix_multiply.cpp
+    src/block_matrix_multiplier.cpp
     src/cublas_matrix_multiplier.cu
+    src/standard_matrix_multiplier.cpp
+    src/opencl_matrix_multiplier.cpp
 )
 
 set_target_properties(${PROJECT_NAME} PROPERTIES

@@ -8,7 +8,7 @@
 #include <streambuf>
 #include <matrix_multiplier.hpp>
 #include <standard_matrix_multiplier.hpp>
-#include <block_matrix_multipler.hpp>
+#include <block_matrix_multiplier.hpp>
 #include <opencl_matrix_multiplier.hpp>
 #include <cublas_matrix_multiplier.hpp>
 
@@ -86,7 +86,7 @@ int main()
     StandardMatrixMultipler<N> standard_matrix_multiplier;
     benchmark_matrix_multiply<N>(standard_matrix_multiplier, A, B, C, expected);
 
-    BlockMatrixMultipler<N, 16> block_matrix_multiplier;
+    BlockMatrixMultiplier<N, 16> block_matrix_multiplier;
     benchmark_matrix_multiply<N>(block_matrix_multiplier, A, B, C, expected);
 
     OpenCLMatrixMultiplier<N> opencl_matrix_multiplier;

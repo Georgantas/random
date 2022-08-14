@@ -3,6 +3,7 @@
 #include <cuda_runtime.h>
 #include <cassert>
 #include <cublas_v2.h>
+#include <cstdio>
 
 template <long N>
 CublasMatrixMultiplier<N>::CublasMatrixMultiplier()

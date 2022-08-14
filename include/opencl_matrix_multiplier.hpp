@@ -1,67 +1,22 @@
 
-#include "matrix_multiplier.hpp"
-#include <CL/cl.hpp>
-#include <cstdio>
+#include <matrix_multiplier.hpp>
 #include <memory>
+#include <CL/cl.hpp>
 
 #pragma once
 
 template <long N>
 class OpenCLMatrixMultiplier : public IMatrixMultiplier<N>
 {
+public:
+    OpenCLMatrixMultiplier();
+    virtual void multiply(float (&A)[N][N], float (&B)[N][N], float (&C)[N][N]) override;
+
 private:
     std::unique_ptr<cl::Buffer> A_d;
     std::unique_ptr<cl::Buffer> B_d;
     std::unique_ptr<cl::Buffer> C_d;
-
     std::unique_ptr<cl::CommandQueue> queue;
-
     std::unique_ptr<cl::make_kernel<cl::Buffer, cl::Buffer, cl::Buffer, int>> matrix_multiply;
-
     std::unique_ptr<cl::NDRange> global;
-public:
-    OpenCLMatrixMultiplier()
-    {
-        std::vector<cl::Platform> platforms;
-        cl::Platform::get(&platforms);
-        assert(platforms.size() == 1);
-        cl::Platform platform = platforms.front();
-
-        std::vector<cl::Device> devices;
-        platform.getDevices(CL_DEVICE_TYPE_ALL, &devices);
-        assert(devices.size() == 1);
-        cl::Device device = devices.front();
-
-        printf("Platform: %s\nDevice: %s\n\n", device.getInfo<CL_DEVICE_NAME>().c_str(), platform.getInfo<CL_PLATFORM_NAME>().c_str());
-
-        cl::Context context({device});
-        A_d = std::make_unique<cl::Buffer>(context, CL_MEM_READ_ONLY, sizeof(float) * N * N);
-        B_d = std::make_unique<cl::Buffer>(context, CL_MEM_READ_ONLY, sizeof(float) * N * N);
-        C_d = std::make_unique<cl::Buffer>(context, CL_MEM_WRITE_ONLY, sizeof(float) * N * N);
-
-        queue = std::make_unique<cl::CommandQueue>(context, device);
-
-        std::ifstream kernel_code_stream("matrix_multiply_kernel.cl");
-        std::string kernel_code((std::istreambuf_iterator<char>(kernel_code_stream)),
-                                std::istreambuf_iterator<char>());
-
-        cl::Program::Sources sources;
-        sources.emplace_back(kernel_code.c_str(), kernel_code.length());
-
-        cl::Program program(context, sources);
-
-        assert(program.build({device}) == CL_SUCCESS);
-
-        matrix_multiply = std::make_unique<cl::make_kernel<cl::Buffer, cl::Buffer, cl::Buffer, int>>(cl::Kernel(program, "matrix_multiply"));
-
-        global = std::make_unique<cl::NDRange>(N, N);
-    }
-
-    virtual void multiply(float (&A)[N][N], float (&B)[N][N], float (&C)[N][N]) override
-    {
-        queue->enqueueWriteBuffer(*A_d, CL_TRUE, 0, sizeof(float) * N * N, A);
-        queue->enqueueWriteBuffer(*B_d, CL_TRUE, 0, sizeof(float) * N * N, B);
-        (*matrix_multiply)(cl::EnqueueArgs(*queue, *global), *A_d, *B_d, *C_d, (int)N).wait();
-        queue->enqueueReadBuffer(*C_d, CL_TRUE, 0, sizeof(float) * N * N, C);
-    }
 };
