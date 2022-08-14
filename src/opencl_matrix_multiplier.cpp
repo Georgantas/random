@@ -11,12 +11,12 @@ OpenCLMatrixMultiplier<N>::OpenCLMatrixMultiplier()
 {
     std::vector<cl::Platform> platforms;
     cl::Platform::get(&platforms);
-    assert(platforms.size() == 1);
+    assert(platforms.size() > 0);
     cl::Platform platform = platforms.front();
 
     std::vector<cl::Device> devices;
     platform.getDevices(CL_DEVICE_TYPE_ALL, &devices);
-    assert(devices.size() == 1);
+    assert(devices.size() > 0);
     cl::Device device = devices.front();
 
     printf("Platform: %s\nDevice: %s\n\n", device.getInfo<CL_DEVICE_NAME>().c_str(), platform.getInfo<CL_PLATFORM_NAME>().c_str());

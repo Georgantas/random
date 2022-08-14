@@ -31,10 +31,10 @@ void CublasMatrixMultiplier<N>::multiply(float (&A)[N][N], float (&B)[N][N], flo
     cudaStatus = cudaMalloc(&C_d, N * N * sizeof(*C_d));
     assert(cudaStatus == cudaSuccess);
 
-    cublasStatus_t cublasStatus = cublasSetMatrix(N, N, sizeof(*A), A, N, A_d, N);
-    assert(cublasStatus == CUBLAS_STATUS_SUCCESS);
-    cublasStatus = cublasSetMatrix(N, N, sizeof(*B), B, N, B_d, N);
-    assert(cublasStatus == CUBLAS_STATUS_SUCCESS);
+    cudaStatus = cudaMemcpy2D(A_d, 0, A, 0, N, N, cudaMemcpyHostToDevice);
+    assert(cudaStatus == cudaSuccess);
+    cudaStatus = cudaMemcpy2D(B_d, 0, B, 0, N, N, cudaMemcpyHostToDevice);
+    assert(cudaStatus == cudaSuccess);
 
     const float alpha = 1;
     const float beta = 0;
