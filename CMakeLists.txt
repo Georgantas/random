@@ -5,8 +5,7 @@ project(benchmark_matrix_multiply LANGUAGES CXX CUDA)
 
 find_library(CUDART_LIBRARY cudart ${CMAKE_CUDA_IMPLICIT_LINK_DIRECTORIES})
 find_library(CUBLAS_LIBRARY cublas ${CMAKE_CUDA_IMPLICIT_LINK_DIRECTORIES})
-
-find_package(OpenCL REQUIRED)
+find_library(OPENCL_LIBRARY OpenCL ${CMAKE_CUDA_IMPLICIT_LINK_DIRECTORIES})
 
 add_executable(
     ${PROJECT_NAME}
@@ -31,7 +30,7 @@ target_link_libraries(
     ${PROJECT_NAME}
     ${CUDART_LIBRARY}
     ${CUBLAS_LIBRARY}
-    OpenCL::OpenCL
+    ${OPENCL_LIBRARY}
 )
 
 configure_file(resources/matrix_multiply_kernel.cl matrix_multiply_kernel.cl COPYONLY)

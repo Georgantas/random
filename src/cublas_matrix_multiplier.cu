@@ -31,17 +31,18 @@ void CublasMatrixMultiplier<N>::multiply(float (&A)[N][N], float (&B)[N][N], flo
     cudaStatus = cudaMalloc(&C_d, N * N * sizeof(*C_d));
     assert(cudaStatus == cudaSuccess);
 
-    cudaStatus = cudaMemcpy2D(A_d, 0, A, 0, N, N, cudaMemcpyHostToDevice);
+    cudaStatus = cudaMemcpy2D(A_d, N * sizeof(float), A, N * sizeof(float), N * sizeof(float), N, cudaMemcpyHostToDevice);
     assert(cudaStatus == cudaSuccess);
-    cudaStatus = cudaMemcpy2D(B_d, 0, B, 0, N, N, cudaMemcpyHostToDevice);
+    cudaStatus = cudaMemcpy2D(B_d, N * sizeof(float), B, N * sizeof(float), N * sizeof(float), N, cudaMemcpyHostToDevice);
     assert(cudaStatus == cudaSuccess);
 
     const float alpha = 1;
     const float beta = 0;
 
-    cublasSgemm(cublasHandle, CUBLAS_OP_N, CUBLAS_OP_N, N, N, N, &alpha, A_d, N, B_d, N, &beta, C_d, N);
+    cublasSgemm(cublasHandle, CUBLAS_OP_N, CUBLAS_OP_N, N, N, N, &alpha, B_d, N, A_d, N, &beta, C_d, N);
 
-    cudaMemcpy2D(C, 0, C_d, 0, N, N, cudaMemcpyDeviceToHost);
+    cudaStatus = cudaMemcpy2D(C, N * sizeof(float), C_d, N * sizeof(float), N * sizeof(float), N, cudaMemcpyDeviceToHost);
+    assert(cudaStatus == cudaSuccess);
 }
 
 // explicit instantion: https://docs.microsoft.com/en-us/cpp/cpp/explicit-instantiation?view=msvc-170
