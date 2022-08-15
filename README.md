@@ -1,31 +1,31 @@
 
-### StandardMatrixMultiplier
+### [StandardMatrixMultiplier](https://github.com/georgantas/benchmark-matrix-multiply/blob/master/src/standard_matrix_multiplier.cpp)
 #### Explanation
 Standard triple for-loop using the CPU.
 #### Performance
 - **On Dell XPS 13:** FLOPs: 2147483648; Execution time: 5.25 seconds; GFLOPS: 0.4090;
 ---
-### BlockMatrixMultiplier
+### [BlockMatrixMultiplier](https://github.com/georgantas/benchmark-matrix-multiply/blob/master/src/block_matrix_multiplier.cpp)
 #### Explanation
 Using the CPU with blocking for more temporal and spatial locality. Leverages the L1 cache. More details [here](https://csapp.cs.cmu.edu/public/waside/waside-blocking.pdf).
 #### Performance
 - **On Dell XPS 13:** FLOPs: 2147483648; Execution time: 3.35 seconds; GFLOPS: 0.6402;
 ---
-### OpenCLMatrixMultiplier
+### [OpenCLMatrixMultiplier](https://github.com/georgantas/benchmark-matrix-multiply/blob/master/src/opencl_matrix_multiplier.cpp)
 #### Explanation
 Using the GPU with a basic OpenCL kernel.
 #### Performance
 - **Platform: [NVIDIA TITAN Xp](https://vast.ai) / Device: NVIDIA CUDA:** FLOPs: 2147483648; Execution time: 0.04 seconds; GFLOPS: 51.8588;
 - **Platform: Intel(R) Core(TM) i7-10710U CPU @ 1.10GHz / Device: Intel(R) OpenCL:** FLOPs: 2147483648; Execution time: 0.10 seconds; GFLOPS: 20.7495;
 ---
-### CublasMatrixMultiplier
+### [CublasMatrixMultiplier](https://github.com/georgantas/benchmark-matrix-multiply/blob/master/src/cublas_matrix_multiplier.cu)
 #### Explanation
 Use cuBLAS.
 #### Performance
 - **Platform: [Tesla K80](https://vast.ai):** FLOPs: 2147483648; Execution time: 0.01 seconds; GFLOPS: 304.7607;
 - **Platform: [RTX 3090](https://vast.ai):** FLOPs: 2147483648; Execution time: 0.00 seconds; GFLOPS: 773.4415;
 ---
-### CudaBlockMatrixMultipler
+### [CudaBlockMatrixMultipler](https://github.com/georgantas/benchmark-matrix-multiply/blob/master/src/cuda_block_matrix_multiplier.cu)
 #### Explanation
 Load blocks into GPU shared memory to reduce global memory accesses. Explained in detail [here](https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#shared-memory).
 
