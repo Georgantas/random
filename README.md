@@ -1,5 +1,4 @@
 
-## Completed
 ### StandardMatrixMultiplier
 #### Explanation
 Standard triple for-loop using the CPU.
