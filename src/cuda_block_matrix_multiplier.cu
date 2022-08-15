@@ -1,5 +1,6 @@
 
 #include <cuda_block_matrix_multiplier.hpp>
+#include <cassert>
 
 // Code adapted from example at: https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html
 
@@ -104,20 +105,20 @@ void CudaBlockMatrixMultipler<N>::multiply(float (&A)[N][N], float (&B)[N][N], f
     d_A.width = d_A.stride = N;
     d_A.height = N;
     size_t size = N * N * sizeof(float);
-    cudaMalloc(&d_A.elements, size);
-    cudaMemcpy(d_A.elements, A, size, cudaMemcpyHostToDevice);
+    assert(cudaSuccess == cudaMalloc(&d_A.elements, size));
+    assert(cudaSuccess == cudaMemcpy(d_A.elements, A, size, cudaMemcpyHostToDevice));
 
     d_B.width = d_B.stride = N;
     d_B.height = N;
     size = N * N * sizeof(float);
-    cudaMalloc(&d_B.elements, size);
-    cudaMemcpy(d_B.elements, B, size, cudaMemcpyHostToDevice);
+    assert(cudaSuccess == cudaMalloc(&d_B.elements, size));
+    assert(cudaSuccess == cudaMemcpy(d_B.elements, B, size, cudaMemcpyHostToDevice));
 
     // Allocate C in device memory
     d_C.width = d_C.stride = N;
     d_C.height = N;
     size = N * N * sizeof(float);
-    cudaMalloc(&d_C.elements, size);
+    assert(cudaSuccess == cudaMalloc(&d_C.elements, size));
 
     // Invoke kernel
     dim3 dimBlock(BLOCK_SIZE, BLOCK_SIZE);
@@ -125,7 +126,7 @@ void CudaBlockMatrixMultipler<N>::multiply(float (&A)[N][N], float (&B)[N][N], f
     MatMulKernel<<<dimGrid, dimBlock>>>(d_A, d_B, d_C);
 
     // Read C from device memory
-    cudaMemcpy(C, d_C.elements, size, cudaMemcpyDeviceToHost);
+    assert(cudaSuccess == cudaMemcpy(C, d_C.elements, size, cudaMemcpyDeviceToHost));
 }
 
 template class CudaBlockMatrixMultipler<1024>;
