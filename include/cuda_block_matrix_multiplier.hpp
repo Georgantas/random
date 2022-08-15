@@ -3,7 +3,7 @@
 
 #pragma once
 
-// Code adapted from example at: https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html
+// CUDA code from: https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html
 
 // Matrices are stored in row-major order:
 // M(row, col) = *(M.elements + row * M.stride + col)

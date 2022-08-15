@@ -2,7 +2,7 @@
 #include <cuda_block_matrix_multiplier.hpp>
 #include <cassert>
 
-// Code adapted from example at: https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html
+// CUDA code from: https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html
 
 #define BLOCK_SIZE 16
 
